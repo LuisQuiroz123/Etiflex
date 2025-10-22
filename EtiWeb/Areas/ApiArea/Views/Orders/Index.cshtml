@@ -1,0 +1,146 @@
+﻿@model IEnumerable<WebApi.Data.Orders>
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800">Órdenes</h1>
+
+@*     <div class="mb-4">
+        <a asp-action="Create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition">
+            Nueva Orden
+        </a>
+    </div> *@
+
+    <div class="overflow-auto border rounded shadow max-h-[500px]">
+        <table class="table-auto w-full text-left border-collapse" id="ordersTable">
+            <thead class="bg-gray-200 sticky top-0 z-10">
+                <tr>
+                    <th class="py-2 px-4 cursor-pointer" data-column="ProductId">Producto <span></span></th>
+                    <th class="py-2 px-4 cursor-pointer" data-column="Quantity">Cantidad <span></span></th>
+                    <th class="py-2 px-4 cursor-pointer" data-column="ClientName">Cliente <span></span></th>
+                    <th class="py-2 px-4 cursor-pointer" data-column="Address">Dirección <span></span></th>
+                    <th class="py-2 px-4">Acciones</th>
+                </tr>
+                <tr class="bg-gray-100">
+                    <th><input type="text" id="filterProductId" placeholder="Filtrar..." class="w-full px-1 py-0.5 border rounded text-sm"></th>
+                    <th><input type="text" id="filterQuantity" placeholder="Filtrar..." class="w-full px-1 py-0.5 border rounded text-sm"></th>
+                    <th><input type="text" id="filterClientName" placeholder="Filtrar..." class="w-full px-1 py-0.5 border rounded text-sm"></th>
+                    <th><input type="text" id="filterAddress" placeholder="Filtrar..." class="w-full px-1 py-0.5 border rounded text-sm"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 flex justify-between items-center">
+        <button id="prevPage" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Anterior</button>
+        <span>Página <span id="currentPage">1</span> de <span id="totalPages">1</span></span>
+        <button id="nextPage" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Siguiente</button>
+    </div>
+</div>
+
+<script>
+    const orders = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+    let currentPage = 1;
+    const pageSize = 5;
+    let sortColumn = '';
+    let sortAsc = true;
+    const filters = { ProductId: '', Quantity: '', ClientName: '', Address: '' };
+
+    function filteredData() {
+        return orders.filter(o =>
+            (!filters.ProductId || o.ProductId.toString().toLowerCase().includes(filters.ProductId.toLowerCase())) &&
+            (!filters.Quantity || o.Quantity.toString().toLowerCase().includes(filters.Quantity.toLowerCase())) &&
+            (!filters.ClientName || o.ClientName.toLowerCase().includes(filters.ClientName.toLowerCase())) &&
+            (!filters.Address || o.Address.toLowerCase().includes(filters.Address.toLowerCase()))
+        );
+    }
+
+    function sortedData() {
+        let data = filteredData();
+        if(sortColumn) {
+            data.sort((a,b) => {
+                if(a[sortColumn] < b[sortColumn]) return sortAsc ? -1 : 1;
+                if(a[sortColumn] > b[sortColumn]) return sortAsc ? 1 : -1;
+                return 0;
+            });
+        }
+        return data;
+    }
+
+    function paginatedData() {
+        const start = (currentPage - 1) * pageSize;
+        return sortedData().slice(start, start + pageSize);
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('ordersBody');
+        tbody.innerHTML = '';
+        paginatedData().forEach(o => {
+            const tr = document.createElement('tr');
+            tr.classList.add('border-b', 'hover:bg-gray-100', 'transition', 'duration-150');
+            tr.innerHTML = `
+                <td class="py-2 px-4">${o.ProductId}</td>
+                <td class="py-2 px-4">${o.Quantity}</td>
+                <td class="py-2 px-4">${o.ClientName}</td>
+                <td class="py-2 px-4">${o.Address}</td>
+                <td class="py-2 px-4 flex flex-wrap space-x-1">
+
+
+    <button type="button" class="btn btn-primary btn-sm me-1" style="padding: 0.35rem 0.6rem;" onclick="location.href='/ApiArea/Orders/Edit/${o.Id}'">
+        <i class="bi bi-pencil me-1"></i> Editar
+    </button>
+
+
+    <button type="button" class="btn btn-success btn-sm me-1" style="padding: 0.35rem 0.6rem;" onclick="location.href='/ApiArea/Orders/Details/${o.Id}'">
+        <i class="bi bi-eye me-1"></i> Detalles
+    </button>
+
+
+    <button type="button" class="btn btn-danger btn-sm" style="padding: 0.35rem 0.6rem;" onclick="if(confirm('¿Seguro que quieres eliminar?')) location.href='/ApiArea/Orders/Delete/${o.Id}'">
+        <i class="bi bi-trash me-1"></i> Eliminar
+    </button>
+ 
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('currentPage').innerText = currentPage;
+        document.getElementById('totalPages').innerText = Math.ceil(sortedData().length / pageSize);
+    }
+
+    // Filtros
+    ['ProductId','Quantity','ClientName','Address'].forEach(f => {
+        document.getElementById('filter'+f).addEventListener('input', e => {
+            filters[f] = e.target.value;
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    // Paginación
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if(currentPage > 1) currentPage--;
+        renderTable();
+    });
+    document.getElementById('nextPage').addEventListener('click', () => {
+        if(currentPage < Math.ceil(sortedData().length / pageSize)) currentPage++;
+        renderTable();
+    });
+
+    // Ordenamiento
+    document.querySelectorAll('#ordersTable thead th[data-column]').forEach(th => {
+        th.addEventListener('click', () => {
+            const col = th.dataset.column;
+            if(sortColumn === col) sortAsc = !sortAsc; else { sortColumn = col; sortAsc = true; }
+            document.querySelectorAll('#ordersTable thead th[data-column] span').forEach(s => s.textContent='');
+            th.querySelector('span').textContent = sortAsc ? '▲' : '▼';
+            renderTable();
+        });
+    });
+
+    renderTable();
+</script>

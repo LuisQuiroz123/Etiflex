@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser>
+
+<h2>Usuarios</h2>
+<p><a asp-action="CreateUser" class="btn btn-primary">Crear Usuario</a></p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>
+                    <a asp-action="AssignRole" asp-route-userId="@user.Id" class="btn btn-info">Roles</a>
+                    <a asp-action="DeleteUser" asp-route-id="@user.Id" class="btn btn-danger"
+                       onclick="return confirm('¿Eliminar usuario?');">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,51 @@
+﻿@{
+    var userId = ViewBag.UserId;
+    var userEmail = ViewBag.UserEmail;
+    var roles = ViewBag.Roles as List<Microsoft.AspNetCore.Identity.IdentityRole>;
+    var userRoles = ViewBag.UserRoles as IList<string>;
+}
+
+<h2>Asignar Roles a @userEmail</h2>
+
+<form asp-action="AssignRole" method="post">
+    <input type="hidden" name="userId" value="@userId" />
+    <div class="mb-3">
+        <label>Seleccionar Rol</label>
+        <select name="roleName" class="form-control">
+            @foreach (var role in roles)
+            {
+                if (!userRoles.Contains(role.Name))
+                {
+                    <option value="@role.Name">@role.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Agregar Rol</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+<h3>Roles actuales</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in userRoles)
+        {
+            <tr>
+                <td>@role</td>
+                <td>
+                    <form asp-action="RemoveRole" method="post" style="display:inline;">
+                        <input type="hidden" name="userId" value="@userId" />
+                        <input type="hidden" name="roleName" value="@role" />
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,221 @@
+﻿@model IEnumerable<EtiWeb.Data.RequestDetailView>
+
+@{
+    Layout = "_Layout";
+}
+
+<!-- Handsontable -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css">
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    body {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    h1, h2 {
+        color: #111827;
+    }
+
+    #requestsTable {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+        background-color: #ffffff;
+    }
+
+    .handsontable th {
+        background-color: #e2e8f0 !important;
+        font-weight: 600;
+        text-align: center !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+    }
+
+    .handsontable td {
+        font-size: 0.9rem;
+        color: #111827;
+        border-color: #cbd5e1 !important;
+        background-color: #ffffff;
+    }
+
+    .action-btn {
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.15rem;
+        transition: all 0.15s ease-in-out;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .zpl-btn {
+        background-color: #16a34a;
+    }
+
+        .zpl-btn:hover {
+            background-color: #15803d;
+        }
+
+    .print-btn {
+        background-color: #3b82f6;
+    }
+
+        .print-btn:hover {
+            background-color: #2563eb;
+        }
+
+    select.printer-select {
+        padding: 2px 4px;
+        border-radius: 4px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.8rem;
+    }
+
+    .zpl-preview {
+        font-family: monospace;
+        background-color: #f9fafb;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 6px;
+        margin-top: 4px;
+        white-space: pre-wrap;
+        display: none;
+    }
+</style>
+
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4"><i class="fa-solid fa-tag" style="color:#16a34a; margin-right:6px;"></i> Solicitud de Etiquetas</h1>
+
+    <!-- Tabla tipo Excel -->
+    <div style="position: relative;">
+        <div id="requestsTable" style="width: 100%; height: 500px;"></div>
+
+        <table id="totalsTable">
+            <tr>
+                <td>TOTAL Etiquetas:</td>
+                <td id="totalLabels">0</td>
+                <td>Pedidos Totales:</td>
+                <td id="totalPedidos">0</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    const requests = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+    const container = document.getElementById('requestsTable');
+
+    const hot = new Handsontable(container, {
+        data: requests,
+        colHeaders: ["Pedido","Cliente","Tipo Entrega","Dirección","Total Etiquetas","Impresora","Descargar ZPL","Imprimir"],
+        columns: [
+            { data: "RequestNumber", readOnly: true },
+            { data: "ClientData_ClientName", readOnly: true },
+            { data: "DeliveryType", readOnly: true },
+            { data: "Address", readOnly: true },
+            { data: "TotalLabels", type: "numeric", readOnly: true },
+            {
+                data: "SelectedPrinter",
+                renderer: (instance, td, row, col, prop, value) => {
+                    td.innerHTML = `
+                        <select id="printer_${row}" class="printer-select">
+                            <option value="Zebra" ${value === "Zebra" ? "selected" : ""}>Zebra</option>
+                            <option value="Sato" ${value === "Sato" ? "selected" : ""}>Sato</option>
+                            <option value="Godex" ${value === "Godex" ? "selected" : ""}>Godex</option>
+                        </select>
+                    `;
+                    td.style.textAlign = "center";
+                    return td;
+                }
+            },
+
+            {
+                data: "PrintRequestId",
+                renderer: (instance, td, row, col, prop, value) => {
+                    td.innerHTML = `<button class="action-btn zpl-btn" onclick="downloadZPL('${value}')"><i class="fa-solid fa-download"></i> ZPL</button>`;
+                    td.style.textAlign = "center";
+                    return td;
+                }
+            },
+            {
+                data: "PrintRequestId",
+                renderer: (instance, td, row, col, prop, value) => {
+                    td.innerHTML = `<button class="action-btn print-btn" onclick="printDirect('${value}', ${row})"><i class="fa-solid fa-print"></i> Imprimir</button>`;
+                    td.style.textAlign = "center";
+                    return td;
+                }
+            }
+        ],
+        stretchH: "all",
+        height: "500px",
+        width: "100%",
+        filters: true,
+        dropdownMenu: true,
+        manualColumnMove: true,
+        manualColumnResize: true,
+        columnSorting: true,
+        licenseKey: "non-commercial-and-evaluation"
+    });
+
+    // Totales
+    function updateTotal() {
+        const visibleData = hot.getData();
+        let totalEtiquetas = 0;
+        visibleData.forEach(row => { const val = parseInt(row[4]); if(!isNaN(val)) totalEtiquetas += val; });
+        const totalPedidos = visibleData.length;
+        document.getElementById('totalLabels').innerText = totalEtiquetas;
+        document.getElementById('totalPedidos').innerText = totalPedidos;
+    }
+    hot.addHook('afterChange', updateTotal);
+    hot.addHook('afterFilter', updateTotal);
+    hot.addHook('afterColumnSort', updateTotal);
+    updateTotal();
+
+    // Función Vista Previa inline
+    async function togglePreview(printRequestId, row) {
+        const previewDiv = document.getElementById(`preview_${row}`);
+        const printerSelect = document.getElementById(`printer_${row}`);
+        const selectedPrinter = printerSelect.value;
+
+        if (previewDiv.style.display === "block") {
+            previewDiv.style.display = "none";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/ApiArea/Print/Preview/${printRequestId}?printer=${selectedPrinter}`);
+            if (!response.ok) throw new Error(await response.text());
+            const zpl = await response.text();
+            previewDiv.innerText = zpl;
+            previewDiv.style.display = "block";
+        } catch (err) {
+            alert("Error al generar ZPL: " + err.message);
+        }
+    }
+
+    // Descargar ZPL
+    function downloadZPL(printRequestId) {
+        window.location.href = `/ApiArea/Print/Print/${printRequestId}`;
+    }
+
+    // Imprimir
+    async function printDirect(printRequestId, row) {
+        const printerSelect = document.getElementById(`printer_${row}`);
+        const selectedPrinter = printerSelect.value;
+        try {
+            const response = await fetch(`/ApiArea/Print/Print/${printRequestId}?enviarImpresora=true&printer=${selectedPrinter}`);
+            if (response.ok) alert('Etiqueta enviada a la impresora correctamente.');
+            else { const text = await response.text(); alert('Error al enviar etiqueta: ' + text); }
+        } catch (err) { console.error(err); alert('Error de conexión con la impresora.'); }
+    }
+</script>

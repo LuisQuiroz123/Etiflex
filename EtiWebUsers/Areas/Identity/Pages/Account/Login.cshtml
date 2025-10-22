@@ -1,0 +1,227 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Log in";
+    ViewData["HideLayoutMenu"] = true; // Oculta menú y sidebar
+}
+
+@{
+    Layout = null;
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #1f4068, #2980b9);
+        font-family: 'Segoe UI', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+    }
+
+    /* Card moderna con sombra y animación */
+    .login-card {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        padding: 3rem 2.5rem;
+        max-width: 450px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        transform: translateY(-60px);
+        opacity: 0;
+        animation: slideFadeIn 0.6s forwards;
+        transition: all 0.3s ease-in-out;
+    }
+
+    @@keyframes slideFadeIn {
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .login-logo {
+        display: block;
+        margin: 0 auto 1.5rem auto;
+        height: 90px;
+        width: auto;
+    }
+
+    .login-card h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #1f4068;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    /* Inputs ampliados con efecto moderno */
+    .form-floating input.form-control {
+        width: 100%;
+        padding: 1.5rem 1rem;
+        font-size: 1rem;
+        border-radius: 15px;
+        background-color: rgba(245, 245, 245, 0.9);
+        border: 1px solid #ccc;
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .form-floating input.form-control:focus,
+        .form-floating input.form-control:not(:placeholder-shown) {
+            border-color: #2980b9;
+            box-shadow: 0 0 12px rgba(41, 128, 185, 0.5);
+            background-color: #fff;
+        }
+
+    .form-floating label {
+        color: #555;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Botón login con gradiente y efecto hover */
+    .login-btn {
+        background: linear-gradient(135deg, #2980b9, #6dd5fa);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        border-radius: 15px;
+        width: 100%;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+        }
+
+    /* Divider elegante */
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        color: #555;
+        position: relative;
+    }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            height: 1px;
+            width: 40%;
+            background: #ccc;
+            position: absolute;
+            top: 50%;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+    /* Botones sociales con efecto moderno */
+    .btn-google {
+        background-color: #db4437;
+        color: #fff;
+    }
+
+        .btn-google:hover {
+            background-color: #c33d2f;
+        }
+
+    .btn-microsoft {
+        background-color: #2F2F2F;
+        color: #fff;
+    }
+
+        .btn-microsoft:hover {
+            background-color: #1d1d1d;
+        }
+
+    .btn-social {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        border-radius: 15px;
+        padding: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .btn-social:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+    .link-soft {
+        color: #2980b9;
+        text-decoration: underline;
+        font-size: 0.9rem;
+    }
+
+        .link-soft:hover {
+            color: #1f4068;
+            text-decoration: none;
+        }
+</style>
+
+<div class="login-card">
+    <!-- Logo -->
+    <img src="~/images/logo.jpeg" alt="Logo" class="login-logo" />
+
+    <h2>@ViewData["Title"]</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Email" class="form-control" placeholder="name@example.com" autocomplete="username" />
+            <label asp-for="Input.Email">Email</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Password" type="password" class="form-control" placeholder="Password" autocomplete="current-password" />
+            <label asp-for="Input.Password">Password</label>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" asp-for="Input.RememberMe" />
+            <label class="form-check-label" asp-for="Input.RememberMe">Recordar</label>
+        </div>
+
+        <button type="submit" class="login-btn mb-3">Iniciar sesión</button>
+
+@*         <div class="d-flex justify-content-between mb-3">
+            <a asp-page="./ForgotPassword" class="link-soft">Forgot password?</a>
+            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="link-soft">Register</a>
+        </div> *@
+
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
+            <div class="divider">Or log in with</div>
+            <div class="d-grid gap-2">
+                @foreach (var provider in Model.ExternalLogins!)
+                {
+                    var btnClass = provider.Name.ToLower() == "google" ? "btn-google" :
+                    provider.Name.ToLower() == "microsoft" ? "btn-microsoft" : "btn-outline-primary";
+                    <button type="submit" class="btn @btnClass btn-social" name="provider" value="@provider.Name">
+                        @provider.DisplayName
+                    </button>
+                }
+            </div>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

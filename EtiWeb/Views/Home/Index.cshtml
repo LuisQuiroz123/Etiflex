@@ -1,0 +1,165 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var salesData = ViewBag.SalesByMonth as List<dynamic>;
+    var orderStates = ViewBag.OrderStates as List<dynamic>;
+}
+
+<div class="container-fluid py-3">
+    <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Etiflex</h2>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-bag-check display-6 text-primary"></i>
+                    <h5 class="mt-2">Órdenes</h5>
+                    <h3 class="fw-bold">@ViewBag.TotalOrders</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-text display-6 text-success"></i>
+                    <h5 class="mt-2">Solicitudes</h5>
+                    <h3 class="fw-bold">@ViewBag.TotalRequests</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-cash-stack display-6 text-warning"></i>
+                    <h5 class="mt-2">Ventas</h5>
+                    <h3 class="fw-bold">@ViewBag.TotalSales</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-graph-up"></i> Ventas por Mes
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" style="min-height:300px"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-pie-chart"></i> Estados de Órdenes
+                </div>
+                <div class="card-body">
+                    <canvas id="stateChart" style="min-height:300px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Datos desde ViewBag
+        let salesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SalesByMonth));
+        const orderStates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.OrderStates));
+
+        // --- Ordenar ventas por mes ---
+        salesData = salesData.map(x => ({
+            ...x,
+            // Convertir la cadena de fecha en objeto Date para ordenar
+            DateObj: new Date(x.Month + "-01")
+        }))
+        .sort((a, b) => a.DateObj - b.DateObj);
+
+        // Mapa de colores para estados de orden
+        const colorMap = {
+            "Sin estado": "#6c757d",
+            "Pending": "#0d6efd",
+            "Approved": "#198754",
+            "Rejected": "#dc3545"
+        };
+        const backgroundColors = orderStates.map(x => colorMap[x.Estado] || "#ffc107");
+
+        // Gráfico de ventas por mes
+        new Chart(document.getElementById('salesChart'), {
+            type: 'bar',
+            data: {
+                labels: salesData.map(x => x.Month),
+                datasets: [{
+                    label: 'Total Ventas ($)',
+                    data: salesData.map(x => x.Total),
+                    backgroundColor: '#0d6efd88',
+                    borderColor: '#0d6efd',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.raw;
+                                return `$ ${value.toLocaleString()}`;
+                            }
+                        }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return `$ ${value.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // Gráfico de estados de órdenes
+        new Chart(document.getElementById('stateChart'), {
+            type: 'pie',
+            data: {
+                labels: orderStates.map(x => x.Estado),
+                datasets: [{
+                    data: orderStates.map(x => x.Total),
+                    backgroundColor: backgroundColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.raw;
+                                let label = context.label || '';
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+}

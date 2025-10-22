@@ -1,0 +1,93 @@
+﻿@model EtiWeb.Data.Request
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+
+<div>
+    <h4>Request</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RequestNumber)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RequestNumber)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DeliveryType)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DeliveryType)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_TransactionId)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_TransactionId)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_ClientName)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_ClientName)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_ClientCode)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_ClientCode)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_AddressLine1)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_AddressLine1)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_AddressLine2)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_AddressLine2)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_AddressLine3)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_AddressLine3)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_PhoneNumber)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_PhoneNumber)
+        </dd>
+        <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.ClientData_Attent)
+        </dt>
+        <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.ClientData_Attent)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.RequestNumber">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+</body>
+</html>

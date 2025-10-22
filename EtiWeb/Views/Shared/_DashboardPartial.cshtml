@@ -1,0 +1,49 @@
+﻿<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total Etiquetas</h5>
+                <p class="card-text fs-3">123</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total Ordenes de Venta</h5>
+                <p class="card-text fs-3">456</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Enero','Febrero','Marzo','Abril','Mayo'],
+                datasets: [{
+                    label: 'Ventas',
+                    data: [1200, 1900, 3000, 2500, 4000],
+                    backgroundColor: 'rgba(13,110,253,0.2)',
+                    borderColor: 'rgba(13,110,253,1)',
+                    borderWidth: 2,
+                    fill: true,
+                }]
+            },
+            options: { responsive: true }
+        });
+    });
+</script>

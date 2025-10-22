@@ -1,0 +1,77 @@
+﻿@model WebApi.Data.Orders
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Editar Pedido";
+}
+
+<h1 class="mb-4">Editar Pedido</h1>
+
+<form asp-action="Edit" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+@* 
+    <div class="mb-3">
+        <label asp-for="ProductId" class="form-label"></label>
+        <input asp-for="ProductId" class="form-control" required />
+        <div class="invalid-feedback">
+            Por favor, ingresa el Product ID.
+        </div>
+    </div> *@
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProductId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ProductId, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="Quantity" class="form-label"></label>
+        <input asp-for="Quantity" type="number" class="form-control" min="1" required />
+        <div class="invalid-feedback">
+            Por favor, ingresa una cantidad válida.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ClientName" class="form-label"></label>
+        <input asp-for="ClientName" class="form-control" required />
+        <div class="invalid-feedback">
+            Por favor, ingresa el nombre del cliente.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" required />
+        <div class="invalid-feedback">
+            Por favor, ingresa la dirección.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    @Html.ActionLink("Cancelar", "Index", "Orders", new { area = "ApiArea" }, new { @class = "btn btn-danger" })
+   
+</form>
+
+@section Scripts {
+    <script>
+        // JavaScript para validar el formulario con Bootstrap 5
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}

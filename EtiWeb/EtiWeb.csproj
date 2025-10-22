@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-EtiWeb-f5d844ee-f459-4a99-9b45-997b2c04818c</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Admin\**" />
+    <Compile Remove="Areas\ApiArea\Views\Orders\**" />
+    <Compile Remove="Areas\OrdersArea\**" />
+    <Content Remove="Areas\Admin\**" />
+    <Content Remove="Areas\ApiArea\Views\Orders\**" />
+    <Content Remove="Areas\OrdersArea\**" />
+    <EmbeddedResource Remove="Areas\Admin\**" />
+    <EmbeddedResource Remove="Areas\ApiArea\Views\Orders\**" />
+    <EmbeddedResource Remove="Areas\OrdersArea\**" />
+    <None Remove="Areas\Admin\**" />
+    <None Remove="Areas\ApiArea\Views\Orders\**" />
+    <None Remove="Areas\OrdersArea\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\ApiArea\Controllers\OrdersController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\ApiArea\Data\" />
+    <Folder Include="Areas\ApiArea\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Images\logo.jpeg" />
+  </ItemGroup>
+
+</Project>

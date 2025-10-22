@@ -1,0 +1,41 @@
+﻿@model EtiWeb.Data.PrintLabelViewModel
+
+@{
+    Layout = "_Layout";
+}
+
+<h1 class="text-xl font-bold mb-4">Vista Previa de la Etiqueta</h1>
+
+<form asp-action="Preview" method="post">
+    <input type="hidden" asp-for="PrintRequestId" />
+
+    <!-- Dropdown de impresora -->
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Seleccionar Impresora:</label>
+        <select asp-for="SelectedPrinterBrand" class="w-full border rounded-lg p-2">
+            @foreach (var printer in Model.AvailablePrinters)
+            {
+                <option value="@printer">@printer</option>
+            }
+        </select>
+    </div>
+
+    <!-- Vista previa ZPL -->
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Vista Previa de la Etiqueta (ZPL):</label>
+        <textarea class="w-full h-64 border rounded-lg p-2 font-mono" readonly>@Model.ZplCode</textarea>
+    </div>
+
+    <div class="flex gap-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generar Vista Previa</button>
+        <button type="button" onclick="printLabel()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Imprimir</button>
+    </div>
+</form>
+
+<script>
+    function printLabel() {
+        const zpl = document.querySelector('textarea').value;
+        alert('Aquí enviarías ZPL a la impresora: \n\n' + zpl);
+        // Aquí puedes llamar a tu endpoint de impresión si quieres enviar directamente
+    }
+</script>

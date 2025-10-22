@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<div class="container-fluid py-3">
+    <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Usuarios</h2>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-people-fill display-6 text-primary"></i>
+                    <h5 class="mt-2">Usuarios Totales</h5>
+                    <h3 class="fw-bold">@ViewBag.TotalUsers</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-shield-lock-fill display-6 text-success"></i>
+                    <h5 class="mt-2">Administradores</h5>
+                    <h3 class="fw-bold">@ViewBag.TotalAdmins</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-check-fill display-6 text-warning"></i>
+                    <h5 class="mt-2">Usuarios Activos</h5>
+                    <h3 class="fw-bold">@ViewBag.ActiveUsers</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mt-5">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-bar-chart-fill"></i> Usuarios por Rol
+                </div>
+                <div class="card-body">
+                    <canvas id="rolesChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-pie-chart-fill"></i> Usuarios Activos vs Inactivos
+                </div>
+                <div class="card-body">
+                    <canvas id="activeChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Ejemplo de datos (en tu controller puedes enviar ViewBag.RolesData)
+        const rolesData = [
+            { Rol: "SuperAdmin", Total: 5 },
+            { Rol: "Admin", Total: 10 },
+            { Rol: "User", Total: 27 }
+        ];
+
+        const activeData = [
+            { Estado: "Activo", Total: 30 },
+            { Estado: "Inactivo", Total: 12 }
+        ];
+
+        // --- Gráfico de roles ---
+        new Chart(document.getElementById('rolesChart'), {
+            type: 'bar',
+            data: {
+                labels: rolesData.map(x => x.Rol),
+                datasets: [{
+                    label: 'Usuarios por Rol',
+                    data: rolesData.map(x => x.Total),
+                    backgroundColor: '#0d6efd88',
+                    borderColor: '#0d6efd',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // --- Gráfico de activos vs inactivos ---
+        new Chart(document.getElementById('activeChart'), {
+            type: 'pie',
+            data: {
+                labels: activeData.map(x => x.Estado),
+                datasets: [{
+                    data: activeData.map(x => x.Total),
+                    backgroundColor: ['#198754', '#dc3545']
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+}
